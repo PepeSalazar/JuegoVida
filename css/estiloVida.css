@@ -13,12 +13,67 @@
 *{
     margin:auto;
     text-align:center;
+    /*background-color: #ededed;*/
+}
+
+html{
+    background-color: #ededed;
+}
+
+#controles{
+    /*    margin: auto;
+        text-align: center;*/
+
+    clear:both;
+    float:left;
+    overflow:hidden;
+    width:100%;
+    margin-bottom: 10px;
+}
+
+#informacion{
+    margin: 10px;
+}
+
+#parametros{
+    margin-top: 20px;
+}
+
+
+ul{
+    /*    list-style-type: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        margin: auto;
+        text-align: center;*/
+
+    float:left;
+    left:50%;
+    list-style-type:none;
+    margin:0 auto;
+    padding:0;
+    position:relative;
 }
 
 li{
+    /*    border: 1px solid black;
+        margin-top: 10px;
+        width: 100px;
+        background-color: #99ccff;*/
+    //float: left;
+
+    float:left;
+    position:relative;
+    right:50%;
+}
+
+a {
+    display: block;
     border: 1px solid black;
     margin-top: 10px;
-    width: 100px;
+    width: 150px;
+    text-decoration: none;
     background-color: #99ccff;
 }
 

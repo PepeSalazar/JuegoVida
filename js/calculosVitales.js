@@ -7,9 +7,9 @@
  */
 function generarMatrizVida(/*int*/ renglones, /*int*/ columnas) {
     var matriz = [new Array(renglones)];
-    for (cont = 0; cont < renglones; cont++) {//Renglones
+    for (var cont = 0; cont < renglones; cont++) {//Renglones
         var arregloInterno = [];//Será un renglón.
-        for (cont2 = 0; cont2 < columnas; cont2++) {//Columnas
+        for (var cont2 = 0; cont2 < columnas; cont2++) {//Columnas
             var identificador = ((cont * columnas) + cont2);//Se calcula el id de cada célula.
             var celula = '{"id":' + identificador + ', "renglon":' + cont + ', "columna":' + cont2 + ', "estado":0}'; //console.log("Se crea la célula:" + celula);
             arregloInterno[cont2] = JSON.parse(celula);
@@ -25,11 +25,48 @@ function generarMatrizVida(/*int*/ renglones, /*int*/ columnas) {
  Regreso:       Ninguno.
  */
 function recorrerMatriz(/*arreglo2D*/ matriz, /*int*/ renglones, /*int*/ columnas, /*Función JS*/ miFuncion) {
-    for (cont = 0; cont < renglones; cont++) {//Renglones
-        for (cont2 = 0; cont2 < columnas; cont2++) {//Columnas
+    for (var cont = 0; cont < renglones; cont++) {//Renglones
+        for (var cont2 = 0; cont2 < columnas; cont2++) {//Columnas
             miFuncion(matriz[cont][cont2]);//Se aplica la función a la célula actual.
         }
     }
+}
+
+function generarUniverso() {
+    columnas = document.getElementById("columnas").value;
+    renglones = document.getElementById("renglones").value;
+    tamCelulas = document.getElementById("tamanio").value;
+    porcentajeVida = document.getElementById("porcentaje").value;
+
+    if (isNaN(columnas)) {
+        columnas = 20;
+    }
+    if (isNaN(renglones)) {
+        renglones = 20;
+    }
+    if (isNaN(tamCelulas)) {
+        tamCelulas = 4;
+    }
+    if (isNaN(porcentajeVida)) {
+        porcentajeVida = 0.4;
+    }
+
+    cantidadTotalCelulas = renglones * columnas;
+    cantidadCelulasInicialesVivas = cantidadTotalCelulas * porcentajeVida;
+    console.log("Renglones:" + renglones + " Columnas:" + columnas);
+
+    cantidadGeneraciones = 0;
+    $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones);
+    celulas = generarMatrizVida(renglones, columnas);//console.log(celulas);//Se genera la matriz donde se guarda la información de las células.
+    celulasTemp = generarMatrizVida(renglones, columnas);//Se genera la matriz en donde se guarda el cálculo de la siguiente generación.
+    var c = document.getElementById("mapa");//Se obtiene el mapa donde se despliega la vida.
+    c.width = columnas * tamCelulas;// + (espacioCelulas * columnas);//Se calcula el tamaño del mapa en base a la cantidad de células que tiene.
+    c.height = renglones * tamCelulas;// + (espacioCelulas * renglones);
+    ctx = c.getContext("2d");
+    exterminarVida(celulas);//Se reinicia el mapa.
+    generarVida(celulas, cantidadCelulasInicialesVivas);//Se genera vida nueva de manera aleatoria.
+    recorrerMatriz(celulas, renglones, columnas, pintarCambios);//Se pinta por primera vez el mapa.
+
 }
 
 /*
@@ -199,12 +236,12 @@ function pintarCambios(/*objJSON*/celula) {
 /*
  Descripción:   Copia los estados de las células de una matriz a otra.
  Parámetros:    arreglo2D matrizOriginal: La matriz de la cual se copian los estados.
-                arreglo2D matrizCopia: La matriz en la que se copian los estados.
+ arreglo2D matrizCopia: La matriz en la que se copian los estados.
  Regreso:       Ninguno. Los cambios se hacen ahí mismo.
  */
 function copiarMatriz(/*arreglo2D*/matrizOriginal, /*arreglo2D*/ matrizCopia) {
-    for (cont = 0; cont < renglones; cont++) {//Renglones
-        for (cont2 = 0; cont2 < columnas; cont2++) {//Columnas
+    for (var cont = 0; cont < renglones; cont++) {//Renglones
+        for (var cont2 = 0; cont2 < columnas; cont2++) {//Columnas
             (matrizCopia[cont][cont2]).estado = (matrizOriginal[cont][cont2]).estado;
         }
     }
