@@ -3,42 +3,40 @@
 
 /*
 .habilitado{
-	color: #000
+        color: #000
 }
 .deshabilitado{
-	color:#999999;
+        color:#999999;
 }
 */
 
 *{
-	margin:auto;
-	text-align:center;
+    margin:auto;
+    text-align:center;
 }
 
-
-
 table{
-	margin:auto;
-	padding:0;
-	border-spacing:0;
-	margin-top:100px;
-	border-collapse:collapse;
+    margin:auto;
+    padding:0;
+    border-spacing:0;
+    margin-top:100px;
+    border-collapse:collapse;
 }
 
 td.celula{
-	height: 10px;
-	width: 10px;
-	margin:0;
-	padding:0;
-	background-color: #9FF;
+    height: 10px;
+    width: 10px;
+    margin:0;
+    padding:0;
+    background-color: #9FF;
 }
 
 td.viva{
-	background-color: #0C0;
-	color:#FFFFFF;
+    background-color: #0C0;
+    color:#FFFFFF;
 }
 
 td.muerta{
-	background-color: #09C;
-	color:#000;
+    background-color: #09C;
+    color:#000;
 }
