@@ -116,19 +116,34 @@ function hacerTick() {
  */
 function calcularEstado(/*objJSON*/ celula) {
     //console.log("Se calcula el estado de la célula " + JSON.stringify(celula));
+    var b = 3;//3
+    var s = [2,3];//2,3
     var cantidadVecinosVivos = ContarVecinosVivos(celula);
-    if (cantidadVecinosVivos < 2 && esCelulaViva(celula)) {
+//    if (cantidadVecinosVivos < 2 && esCelulaViva(celula)) {
+//        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por falta de población
+//    }
+//    if ((cantidadVecinosVivos === 2 || cantidadVecinosVivos === 3) && esCelulaViva(celula)) {
+//        revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Se queda viva
+//    }
+//    if (cantidadVecinosVivos > 3 && esCelulaViva(celula)) {
+//        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por sobrepoblación
+//    }
+//    if (cantidadVecinosVivos === 3 && !esCelulaViva(celula)) {
+//        revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Revive por reproducción
+//    }
+    if (cantidadVecinosVivos < s[0] && esCelulaViva(celula)) {
         matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por falta de población
     }
-    if ((cantidadVecinosVivos === 2 || cantidadVecinosVivos === 3) && esCelulaViva(celula)) {
+    if ((cantidadVecinosVivos === s[0] || cantidadVecinosVivos === s[1]) && esCelulaViva(celula)) {
         revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Se queda viva
     }
-    if (cantidadVecinosVivos > 3 && esCelulaViva(celula)) {
+    if (cantidadVecinosVivos > s[1] && esCelulaViva(celula)) {
         matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por sobrepoblación
     }
-    if (cantidadVecinosVivos === 3 && !esCelulaViva(celula)) {
+    if (cantidadVecinosVivos === b && !esCelulaViva(celula)) {
         revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Revive por reproducción
     }
+
 }
 
 /*
