@@ -1,4 +1,20 @@
 //Modelo
+var colonia = [];
+var celulaEjemplo = JSON.parse('{"id":0, "renglon":0, "columna":0, "estado":1}');
+colonia.push(celulaEjemplo);
+celulaEjemplo = JSON.parse('{"id":1, "renglon":0, "columna":1, "estado":1}');
+colonia.push(celulaEjemplo);
+celulaEjemplo = JSON.parse('{"id":2, "renglon":1, "columna":0, "estado":1}');
+colonia.push(celulaEjemplo);
+celulaEjemplo = JSON.parse('{"id":3, "renglon":1, "columna":1, "estado":1}');
+colonia.push(celulaEjemplo);//Se agrega un cuadrito de células.
+colonias = [new Array()];
+colonias.push(colonia);
+
+celulaEjemplo = JSON.parse('{"id":3, "renglon":1, "columna":1, "estado":1}');
+var celulaBuscada = buscarCelulaEnColonia(celulaEjemplo, colonia);
+console.log(colonia);
+console.log("Se buscó la célula " + JSON.stringify(celulaEjemplo) + " y se encontró " + JSON.stringify(celulaBuscada));
 
 /*
  Descripción:   Genera un arreglo 2D de X renglones y Y columnas.
@@ -107,8 +123,8 @@ function hacerTick() {
     cantidadGeneraciones++;
     recorrerMatriz(celulas, renglones, columnas, pintarCambios);//Se despliegan los cambios.
     $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones);
-    
-    recorrerMatriz(celulas, renglones, columnas, buscarColonia);//Se analiza la cantidad de colonias existentes.
+
+    //recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.
 }
 
 /*
@@ -119,7 +135,7 @@ function hacerTick() {
 function calcularEstado(/*objJSON*/ celula) {
     //console.log("Se calcula el estado de la célula " + JSON.stringify(celula));
     var b = 3;//3
-    var s = [2,3];//2,3
+    var s = [2, 3];//2,3
     var cantidadVecinosVivos = ContarVecinosVivos(celula);
 //    if (cantidadVecinosVivos < 2 && esCelulaViva(celula)) {
 //        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por falta de población
@@ -149,29 +165,20 @@ function calcularEstado(/*objJSON*/ celula) {
 }
 
 /*
- Descripción:   Se buscan y crean colonias de células.
+ Descripción:   Analiza y reconoce conjuntos de células para agruparalas en colonias.
  Parámetros:    objJSON celula: La celula a la que se le busca una colonia.
  Regreso:       Ninguno.
  */
-function buscarColonia(/*objJSON*/ celula) {
-    for (x in colonias){
-        obtenerCelula
+function encontrarColonias(/*objJSON*/ celula) {
+    for (colonia in colonias) {
+        var celulasVecinas = obtenerCelulasVecinas(celula);
+        for (celulaVecina in celulasVecinas) {
+            var celulaEncontrada = buscarCelulaEnColonia(celulaVecina, colonia);
+            if (celulaEncontrada.id !== -1) {//Si es una célula válida
+                colonia.push(celula);
+            }
+        }
     }
-    
-    var cantidadVecinosVivos = ContarVecinosVivos(celula);
-    if (cantidadVecinosVivos < s[0] && esCelulaViva(celula)) {
-        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por falta de población
-    }
-    if ((cantidadVecinosVivos === s[0] || cantidadVecinosVivos === s[1]) && esCelulaViva(celula)) {
-        revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Se queda viva
-    }
-    if (cantidadVecinosVivos > s[1] && esCelulaViva(celula)) {
-        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por sobrepoblación
-    }
-    if (cantidadVecinosVivos === b && !esCelulaViva(celula)) {
-        revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Revive por reproducción
-    }
-
 }
 
 /*
@@ -208,7 +215,7 @@ function ContarVecinosVivos(/*objJSON*/ celula) {
  Parámetros:    objJSON celula: La celula a la que se le obtendrán sus vecinos vivos.
  Regreso:       arreglo vecinos: Arreglo con los vecinos vivos.
  */
-function obtenerCelulasVecinas(/*objJSON*/ celula){
+function obtenerCelulasVecinas(/*objJSON*/ celula) {
     var vecinos = [];
     vecinos.push(obtenerCelula(celula.renglon - 1, celula.columna - 1));
     vecinos.push(obtenerCelula(celula.renglon - 1, celula.columna));
@@ -239,6 +246,24 @@ function obtenerCelula(/*int*/ renglon, /*int*/ columna) {
     //console.log("obtenerCelula: Se regresa la célula ["+renglon+","+columna+"]:" + JSON.stringify(celula));
     return celula;
 }
+
+/*
+ Descripción:   Busca una célula dentro de una colonia.
+ Parámetros:    objJSON celula: La célula buscada; arreglo colonia: Donde se busca la célula.
+ Regreso:       objJSON.
+ */
+function buscarCelulaEnColonia(/*objJSON*/ celulaBuscada, /*arreglo*/ colonia) {
+    console.log(colonia.length);
+    for (var cont = 0; cont < colonia.length; cont++) {//No quiso jalar el for each;
+        var celulaActual = colonia[cont];
+        //console.log(celulaActual);
+        if (celulaActual.id === celulaBuscada.id && celulaActual.renglon === celulaBuscada.renglon && celulaActual.columna === celulaBuscada.columna) {
+            return celulaActual;
+        }
+    }
+    return JSON.parse('{"id":-1, "renglon":-1, "columna":-1, "estado":0}');//Célula dummy
+}
+
 
 /*
  Descripción:   Verifica si la célula está vida.
