@@ -9,6 +9,7 @@ var cantidadGeneraciones = 0;//Contador de las generaciones en cada simulación.
 var celulas = [new Array(renglones)];//console.log(celulas);//Contiene la información de cada célula.
 var celulasTemp;//Aqui se almacena el estado calculado de cada célula.
 var ctx;//Contexto del objeto canvas.
+var colonias = [new Array(renglones)];//Las colonias que son formadas por células.
 
 //Control
 $(document).ready(function() {
