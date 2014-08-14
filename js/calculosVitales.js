@@ -1,20 +1,20 @@
 //Modelo
-var colonia = [];
-var celulaEjemplo = JSON.parse('{"id":0, "renglon":0, "columna":0, "estado":1}');
-colonia.push(celulaEjemplo);
-celulaEjemplo = JSON.parse('{"id":1, "renglon":0, "columna":1, "estado":1}');
-colonia.push(celulaEjemplo);
-celulaEjemplo = JSON.parse('{"id":2, "renglon":1, "columna":0, "estado":1}');
-colonia.push(celulaEjemplo);
-celulaEjemplo = JSON.parse('{"id":3, "renglon":1, "columna":1, "estado":1}');
-colonia.push(celulaEjemplo);//Se agrega un cuadrito de células.
-colonias = [new Array()];
-colonias.push(colonia);
-
-celulaEjemplo = JSON.parse('{"id":3, "renglon":1, "columna":1, "estado":1}');
-var celulaBuscada = buscarCelulaEnColonia(celulaEjemplo, colonia);
-console.log(colonia);
-console.log("Se buscó la célula " + JSON.stringify(celulaEjemplo) + " y se encontró " + JSON.stringify(celulaBuscada));
+//var colonia = [];
+//var celulaEjemplo = JSON.parse('{"id":0, "renglon":0, "columna":0, "estado":1}');
+//colonia.push(celulaEjemplo);
+//celulaEjemplo = JSON.parse('{"id":1, "renglon":0, "columna":1, "estado":1}');
+//colonia.push(celulaEjemplo);
+//celulaEjemplo = JSON.parse('{"id":2, "renglon":1, "columna":0, "estado":1}');
+//colonia.push(celulaEjemplo);
+//celulaEjemplo = JSON.parse('{"id":3, "renglon":1, "columna":1, "estado":1}');
+//colonia.push(celulaEjemplo);//Se agrega un cuadrito de células.
+//colonias = [new Array()];
+//colonias.push(colonia);
+//
+//celulaEjemplo = JSON.parse('{"id":3, "renglon":1, "columna":1, "estado":1}');
+//var celulaBuscada = buscarCelulaEnColonia(celulaEjemplo, colonia);
+//console.log(colonia);
+//console.log("Se buscó la célula " + JSON.stringify(celulaEjemplo) + " y se encontró " + JSON.stringify(celulaBuscada));
 
 /*
  Descripción:   Genera un arreglo 2D de X renglones y Y columnas.
@@ -27,7 +27,7 @@ function generarMatrizVida(/*int*/ renglones, /*int*/ columnas) {
         var arregloInterno = [];//Será un renglón.
         for (var cont2 = 0; cont2 < columnas; cont2++) {//Columnas
             var identificador = ((cont * columnas) + cont2);//Se calcula el id de cada célula.
-            var celula = '{"id":' + identificador + ', "renglon":' + cont + ', "columna":' + cont2 + ', "estado":0}'; //console.log("Se crea la célula:" + celula);
+            var celula = '{"id":' + identificador + ', "renglon":' + cont + ', "columna":' + cont2 + ', "estado":0, "colonia":-1}'; //console.log("Se crea la célula:" + celula);
             arregloInterno[cont2] = JSON.parse(celula);
         }
         matriz[cont] = arregloInterno;//Se agrega el renglón nuevo a la matriz.
@@ -81,6 +81,7 @@ function generarUniverso() {
     ctx = c.getContext("2d");
     exterminarVida(celulas);//Se reinicia el mapa.
     generarVida(celulas, cantidadCelulasInicialesVivas);//Se genera vida nueva de manera aleatoria.
+    recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.    
     recorrerMatriz(celulas, renglones, columnas, pintarCambios);//Se pinta por primera vez el mapa.
 
 }
@@ -120,11 +121,10 @@ function hacerTick() {
     copiarMatriz(celulas, celulasTemp);//Se copia la matriz en la que se almacenan los cálculos.
     recorrerMatriz(celulas, renglones, columnas, calcularEstado);//Se calcula el estado de cada célula.
     copiarMatriz(celulasTemp, celulas);//Se aplica el cálculo a la matriz original.
+    recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.    
     cantidadGeneraciones++;
     recorrerMatriz(celulas, renglones, columnas, pintarCambios);//Se despliegan los cambios.
     $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones);
-
-    //recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.
 }
 
 /*
@@ -161,7 +161,7 @@ function calcularEstado(/*objJSON*/ celula) {
     if (cantidadVecinosVivos === b && !esCelulaViva(celula)) {
         revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Revive por reproducción
     }
-
+    (celulasTemp[celula.renglon][celula.columna]).colonia = -1; //Revive por reproducción
 }
 
 /*
@@ -169,16 +169,70 @@ function calcularEstado(/*objJSON*/ celula) {
  Parámetros:    objJSON celula: La celula a la que se le busca una colonia.
  Regreso:       Ninguno.
  */
-function encontrarColonias(/*objJSON*/ celula) {
-    for (colonia in colonias) {
+function encontrarColonias(/*objJSON*/ celula, /*objJSON*/ celulaPadre) {
+    if (celula.estado !== 1) {
+        return;
+    }
+    //console.log("Se busca las colonia de la célula:" + JSON.stringify(celula));
+    if (celula.colonia !== -1) {//Pertenece a una colonia
+        //console.log("Ya pertenece a la colonia " + celula.colonia + ", no se revisa.");
+        return;//Ya pertenece a una colonia
+    } else {//No pertenece a una colonia
+        //if (celulaPadre !== undefined){//Tiene un padre
+        if (typeof celulaPadre !== 'undefined') {//Tiene un padre
+            //console.log("Tiene padre de la colonia:" + celulaPadre.colonia);
+            celula.colonia = celulaPadre.colonia;
+        } else {//Es huérfano, inicia una colonia nueva.
+            var nuevaColonia = Math.random() * (1000);
+            //console.log("Funda la colonia:" + nuevaColonia);
+            celula.colonia = nuevaColonia;
+        }
         var celulasVecinas = obtenerCelulasVecinas(celula);
-        for (celulaVecina in celulasVecinas) {
-            var celulaEncontrada = buscarCelulaEnColonia(celulaVecina, colonia);
-            if (celulaEncontrada.id !== -1) {//Si es una célula válida
-                colonia.push(celula);
+        if (celulasVecinas.length === 0) {//No tiene vecinos y genera su propia colonia
+
+        }
+        for (var cont2 = 0; cont2 < celulasVecinas.length; cont2++) {//Por cada celula vecina
+            var celulaVecina = celulasVecinas[cont2];
+            if (celulaVecina.id !== -1 && celulaVecina.estado === 1 && !comparaCelula(celulaVecina, celulaPadre)) {//Si es célula vecina válida y viva, y no su padre.
+                encontrarColonias(celulaVecina, celula);
             }
         }
     }
+//    pertenezco a una colonia?
+//    tengo padre?
+//    por cada vecino
+
+
+//    var cantidadVecinosColonos = 0;//Cantidad de células vecinas vivas que pertenecean a una colonia.
+//    if (celula.estado === 0) {//Si está muerta
+//        return;//No tiene caso buscarle colonia
+//    }
+//    //console.log("Colonias:" + colonias.length);
+//    var celulasVecinas = obtenerCelulasVecinas(celula);
+//    if (celulasVecinas.length === 0) {//No tiene vecinos y genera su propia colonia
+//
+//    }
+//
+//    for (var cont2 = 0; cont2 < celulasVecinas.length; cont2++) {//Por cada celula vecina
+//        var celulaVecina = celulasVecinas[cont2];
+//        if (celulaVecina.id !== -1 && celulaVecina.estado === 1) {//Si es célula vecina válida y viva
+//            if (colonias.length === 0) {//No existe ninguna colonia aún.
+//                var colonia = [];
+//                colonia.push(celula);
+//                colonias.push(colonia);
+//                console.log("Se genera la primera colonia.")
+//                return;
+//            }
+//            for (var cont = 0; cont < colonias.length; cont++) {//Se busca en cada colonia
+//                var colonia = colonias[cont];
+//                var celulaEncontrada = buscarCelulaEnColonia(celulaVecina, colonia);
+//                if (celulaEncontrada.id !== -1) {//Si es una célula válida
+//                    console.log("Se guarda la célula " + JSON.stringify(celula));
+//                    //colonia.push(celula);
+//                }
+//            }
+//        }
+//    }
 }
 
 /*
@@ -234,7 +288,7 @@ function obtenerCelulasVecinas(/*objJSON*/ celula) {
  Regreso:       objJSON celula: La célula encontrada en cierta posición.
  */
 function obtenerCelula(/*int*/ renglon, /*int*/ columna) {
-    var celula = JSON.parse('{"id":-1, "renglon":-1, "columna":-1, "estado":0}');//Célula dummy
+    var celula = JSON.parse('{"id":-1, "renglon":-1, "columna":-1, "estado":0, "colonia":-1}');//Célula dummy
     if (renglon >= 0 && columna >= 0 && renglon < renglones && columna < columnas) {
         try {
             celula = celulas[renglon][columna];
@@ -261,7 +315,7 @@ function buscarCelulaEnColonia(/*objJSON*/ celulaBuscada, /*arreglo*/ colonia) {
             return celulaActual;
         }
     }
-    return JSON.parse('{"id":-1, "renglon":-1, "columna":-1, "estado":0}');//Célula dummy
+    return JSON.parse('{"id":-1, "renglon":-1, "columna":-1, "estado":0, "colonia":-1}');//Célula dummy
 }
 
 
@@ -286,6 +340,7 @@ function esCelulaViva(/*objJSON*/ celula) {
 function matarCelula(/*objJSON*/ celula) {
     //console.log("matarCelula: Se mata la celula " + celula);
     celula.estado = 0;
+    //celula.colonia = -1;
 }
 
 /*
@@ -296,6 +351,22 @@ function matarCelula(/*objJSON*/ celula) {
 function revivirCelula(/*objJSON*/ celula) {
     //console.log("revivirCelula: Se revive la celula " + celula);
     celula.estado = 1;
+    //celula.colonia = -1;
+}
+
+/*
+ Descripción:   Compara dos células.
+ Parámetros:    objJSON celulaOriginal; objJSON celulaComparada.
+ Regreso:       boolean.
+ */
+function comparaCelula(/*objJSON*/celulaOriginal, /*objJSON*/celulaComparada) {
+    if (typeof celulaOriginal !== 'undefined' || typeof celulaComparada !== 'undefined') {//No recibió una célula con la cual comparar.
+        return false;
+    }
+    if (celulaOriginal.columna === celulaComparada.columna && celulaOriginal.renglon === celulaComparada.renglon) {
+        return true;
+    }
+    return false;
 }
 
 /*
@@ -316,8 +387,12 @@ function pintarCambios(/*objJSON*/celula) {
         ctx.fillStyle = "#0C0";
     }
     ctx.fillRect(x, y, x1, y1);//Rellena la célula del color elegido.
-    //ctx.font = "10px Arial";
-    //ctx.fillText(celula.estado,x,y);
+    if (celula.colonia !== -1) {
+        console.log("Se pinta la célula:" + JSON.stringify(celula));
+        ctx.fillStyle = "#000";
+        ctx.font = "10px Arial";
+        ctx.fillText(celula.colonia, (x + tamCelulas / 2), (y + tamCelulas / 2));
+    }
 }
 
 /*
