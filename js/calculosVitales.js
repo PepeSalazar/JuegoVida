@@ -390,8 +390,8 @@ function pintarCambios(/*objJSON*/celula) {
         //ctx.fillStyle = "#0C0";
         var cadena = Math.floor(celula.colonia);
         cadena = cadena.toString(16);
-        ctx.fillStyle = "#00CC" + cadena;
-        //ctx.fillStyle = "#"+cadena+"00" + cadena;
+        //ctx.fillStyle = "#00CC" + cadena;
+        ctx.fillStyle = "#0C0";
         //console.log(cadena);
     }
     ctx.fillRect(x, y, x1, y1);//Rellena la célula del color elegido.
