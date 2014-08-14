@@ -72,7 +72,8 @@ function generarUniverso() {
     console.log("Renglones:" + renglones + " Columnas:" + columnas);
 
     cantidadGeneraciones = 0;
-    $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones);
+    cantidadColonias = 0;
+    //$(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones + "<br>Cantidad de colonias: " + cantidadColonias);
     celulas = generarMatrizVida(renglones, columnas);//console.log(celulas);//Se genera la matriz donde se guarda la información de las células.
     celulasTemp = generarMatrizVida(renglones, columnas);//Se genera la matriz en donde se guarda el cálculo de la siguiente generación.
     var c = document.getElementById("mapa");//Se obtiene el mapa donde se despliega la vida.
@@ -83,6 +84,7 @@ function generarUniverso() {
     generarVida(celulas, cantidadCelulasInicialesVivas);//Se genera vida nueva de manera aleatoria.
     recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.    
     recorrerMatriz(celulas, renglones, columnas, pintarCambios);//Se pinta por primera vez el mapa.
+    $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones + "<br>Cantidad de colonias: " + cantidadColonias);
 
 }
 
@@ -118,13 +120,14 @@ function generarVida(matriz, cantidadCelulasInicialesVivas) {
  Regreso:       Ninguno.
  */
 function hacerTick() {
+    cantidadColonias = 0;
     copiarMatriz(celulas, celulasTemp);//Se copia la matriz en la que se almacenan los cálculos.
     recorrerMatriz(celulas, renglones, columnas, calcularEstado);//Se calcula el estado de cada célula.
     copiarMatriz(celulasTemp, celulas);//Se aplica el cálculo a la matriz original.
-    recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.    
+    recorrerMatriz(celulas, renglones, columnas, encontrarColonias);//Se analiza la cantidad de colonias existentes.
     cantidadGeneraciones++;
     recorrerMatriz(celulas, renglones, columnas, pintarCambios);//Se despliegan los cambios.
-    $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones);
+    $(".informacion").html("Generaci&oacute;n: " + cantidadGeneraciones + "<br>Cantidad de colonias: " + cantidadColonias);
 }
 
 /*
@@ -161,6 +164,7 @@ function calcularEstado(/*objJSON*/ celula) {
     if (cantidadVecinosVivos === b && !esCelulaViva(celula)) {
         revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Revive por reproducción
     }
+    //console.log("Se reinicia la colonia de la célula:" + JSON.stringify(celulasTemp[celula.renglon][celula.columna]));
     (celulasTemp[celula.renglon][celula.columna]).colonia = -1; //Revive por reproducción
 }
 
@@ -183,14 +187,13 @@ function encontrarColonias(/*objJSON*/ celula, /*objJSON*/ celulaPadre) {
             //console.log("Tiene padre de la colonia:" + celulaPadre.colonia);
             celula.colonia = celulaPadre.colonia;
         } else {//Es huérfano, inicia una colonia nueva.
-            var nuevaColonia = Math.random() * (1000);
+            var nuevaColonia = Math.random() * (255);
+            cantidadColonias++;
             //console.log("Funda la colonia:" + nuevaColonia);
             celula.colonia = nuevaColonia;
         }
         var celulasVecinas = obtenerCelulasVecinas(celula);
-        if (celulasVecinas.length === 0) {//No tiene vecinos y genera su propia colonia
 
-        }
         for (var cont2 = 0; cont2 < celulasVecinas.length; cont2++) {//Por cada celula vecina
             var celulaVecina = celulasVecinas[cont2];
             if (celulaVecina.id !== -1 && celulaVecina.estado === 1 && !comparaCelula(celulaVecina, celulaPadre)) {//Si es célula vecina válida y viva, y no su padre.
@@ -338,7 +341,7 @@ function esCelulaViva(/*objJSON*/ celula) {
  Regreso:       Ninguno.
  */
 function matarCelula(/*objJSON*/ celula) {
-    //console.log("matarCelula: Se mata la celula " + celula);
+    //console.log("matarCelula: Se mata la celula " + JSON.stringify(celula));
     celula.estado = 0;
     //celula.colonia = -1;
 }
@@ -384,14 +387,19 @@ function pintarCambios(/*objJSON*/celula) {
     if (celula.estado === 0) {//Varía el colo de la célula de acuerdo a su estado.
         ctx.fillStyle = "#09C";
     } else if (celula.estado === 1) {
-        ctx.fillStyle = "#0C0";
+        //ctx.fillStyle = "#0C0";
+        var cadena = Math.floor(celula.colonia);
+        cadena = cadena.toString(16);
+        ctx.fillStyle = "#00CC" + cadena;
+        //ctx.fillStyle = "#"+cadena+"00" + cadena;
+        //console.log(cadena);
     }
     ctx.fillRect(x, y, x1, y1);//Rellena la célula del color elegido.
-    if (celula.colonia !== -1) {
-        console.log("Se pinta la célula:" + JSON.stringify(celula));
-        ctx.fillStyle = "#000";
-        ctx.font = "10px Arial";
-        ctx.fillText(celula.colonia, (x + tamCelulas / 2), (y + tamCelulas / 2));
+    if (celula.colonia !== -1) {//Lo uso para desplegar información acerca de la célula.
+        //console.log("Se pinta la célula:" + JSON.stringify(celula));
+        //ctx.fillStyle = "#000";
+        //ctx.font = "10px Arial";
+        //ctx.fillText(celula.colonia, (x + tamCelulas / 2), (y + tamCelulas / 2));
     }
 }
 
@@ -405,6 +413,7 @@ function copiarMatriz(/*arreglo2D*/matrizOriginal, /*arreglo2D*/ matrizCopia) {
     for (var cont = 0; cont < renglones; cont++) {//Renglones
         for (var cont2 = 0; cont2 < columnas; cont2++) {//Columnas
             (matrizCopia[cont][cont2]).estado = (matrizOriginal[cont][cont2]).estado;
+            (matrizCopia[cont][cont2]).colonia = (matrizOriginal[cont][cont2]).colonia;
         }
     }
 }
