@@ -140,18 +140,6 @@ function calcularEstado(/*objJSON*/ celula) {
     var b = 3;//3
     var s = [2, 3];//2,3
     var cantidadVecinosVivos = ContarVecinosVivos(celula);
-//    if (cantidadVecinosVivos < 2 && esCelulaViva(celula)) {
-//        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por falta de población
-//    }
-//    if ((cantidadVecinosVivos === 2 || cantidadVecinosVivos === 3) && esCelulaViva(celula)) {
-//        revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Se queda viva
-//    }
-//    if (cantidadVecinosVivos > 3 && esCelulaViva(celula)) {
-//        matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por sobrepoblación
-//    }
-//    if (cantidadVecinosVivos === 3 && !esCelulaViva(celula)) {
-//        revivirCelula(celulasTemp[celula.renglon][celula.columna]); //Revive por reproducción
-//    }
     if (cantidadVecinosVivos < s[0] && esCelulaViva(celula)) {
         matarCelula(celulasTemp[celula.renglon][celula.columna]); //Se muere por falta de población
     }
@@ -204,38 +192,6 @@ function encontrarColonias(/*objJSON*/ celula, /*objJSON*/ celulaPadre) {
 //    pertenezco a una colonia?
 //    tengo padre?
 //    por cada vecino
-
-
-//    var cantidadVecinosColonos = 0;//Cantidad de células vecinas vivas que pertenecean a una colonia.
-//    if (celula.estado === 0) {//Si está muerta
-//        return;//No tiene caso buscarle colonia
-//    }
-//    //console.log("Colonias:" + colonias.length);
-//    var celulasVecinas = obtenerCelulasVecinas(celula);
-//    if (celulasVecinas.length === 0) {//No tiene vecinos y genera su propia colonia
-//
-//    }
-//
-//    for (var cont2 = 0; cont2 < celulasVecinas.length; cont2++) {//Por cada celula vecina
-//        var celulaVecina = celulasVecinas[cont2];
-//        if (celulaVecina.id !== -1 && celulaVecina.estado === 1) {//Si es célula vecina válida y viva
-//            if (colonias.length === 0) {//No existe ninguna colonia aún.
-//                var colonia = [];
-//                colonia.push(celula);
-//                colonias.push(colonia);
-//                console.log("Se genera la primera colonia.")
-//                return;
-//            }
-//            for (var cont = 0; cont < colonias.length; cont++) {//Se busca en cada colonia
-//                var colonia = colonias[cont];
-//                var celulaEncontrada = buscarCelulaEnColonia(celulaVecina, colonia);
-//                if (celulaEncontrada.id !== -1) {//Si es una célula válida
-//                    console.log("Se guarda la célula " + JSON.stringify(celula));
-//                    //colonia.push(celula);
-//                }
-//            }
-//        }
-//    }
 }
 
 /*
@@ -247,14 +203,6 @@ function ContarVecinosVivos(/*objJSON*/ celula) {
     var contadorVecinos = 0;
     //console.log("ContarVecinosVivos: Se van a revisar los vecinos de la celula" + JSON.stringify(celula));
     var vecinos = [];
-//    vecinos.push(obtenerCelula(celula.renglon - 1, celula.columna - 1));
-//    vecinos.push(obtenerCelula(celula.renglon - 1, celula.columna));
-//    vecinos.push(obtenerCelula(celula.renglon - 1, celula.columna + 1));
-//    vecinos.push(obtenerCelula(celula.renglon, celula.columna - 1));
-//    vecinos.push(obtenerCelula(celula.renglon, celula.columna + 1));
-//    vecinos.push(obtenerCelula(celula.renglon + 1, celula.columna - 1));
-//    vecinos.push(obtenerCelula(celula.renglon + 1, celula.columna));
-//    vecinos.push(obtenerCelula(celula.renglon + 1, celula.columna + 1));
     vecinos = obtenerCelulasVecinas(celula);
 
     for (var cont = 0; cont < vecinos.length; cont++) {
@@ -305,24 +253,6 @@ function obtenerCelula(/*int*/ renglon, /*int*/ columna) {
 }
 
 /*
- Descripción:   Busca una célula dentro de una colonia.
- Parámetros:    objJSON celula: La célula buscada; arreglo colonia: Donde se busca la célula.
- Regreso:       objJSON.
- */
-function buscarCelulaEnColonia(/*objJSON*/ celulaBuscada, /*arreglo*/ colonia) {
-    console.log(colonia.length);
-    for (var cont = 0; cont < colonia.length; cont++) {//No quiso jalar el for each;
-        var celulaActual = colonia[cont];
-        //console.log(celulaActual);
-        if (celulaActual.id === celulaBuscada.id && celulaActual.renglon === celulaBuscada.renglon && celulaActual.columna === celulaBuscada.columna) {
-            return celulaActual;
-        }
-    }
-    return JSON.parse('{"id":-1, "renglon":-1, "columna":-1, "estado":0, "colonia":-1}');//Célula dummy
-}
-
-
-/*
  Descripción:   Verifica si la célula está vida.
  Parámetros:    objJSON celula.
  Regreso:       boolean.
@@ -343,7 +273,6 @@ function esCelulaViva(/*objJSON*/ celula) {
 function matarCelula(/*objJSON*/ celula) {
     //console.log("matarCelula: Se mata la celula " + JSON.stringify(celula));
     celula.estado = 0;
-    //celula.colonia = -1;
 }
 
 /*
@@ -354,7 +283,6 @@ function matarCelula(/*objJSON*/ celula) {
 function revivirCelula(/*objJSON*/ celula) {
     //console.log("revivirCelula: Se revive la celula " + celula);
     celula.estado = 1;
-    //celula.colonia = -1;
 }
 
 /*
@@ -387,12 +315,16 @@ function pintarCambios(/*objJSON*/celula) {
     if (celula.estado === 0) {//Varía el colo de la célula de acuerdo a su estado.
         ctx.fillStyle = "#09C";
     } else if (celula.estado === 1) {
-        //ctx.fillStyle = "#0C0";
         var cadena = Math.floor(celula.colonia);
         cadena = cadena.toString(16);
-        //ctx.fillStyle = "#00CC" + cadena;
-        ctx.fillStyle = "#0C0";
+        cadena = formatearCadena(cadena);
         //console.log(cadena);
+        if (cadena !== "00") {
+            cadena = "#00CC" + cadena;
+        } else {
+            cadena = "#00CCFF";
+        }
+        ctx.fillStyle = cadena;
     }
     ctx.fillRect(x, y, x1, y1);//Rellena la célula del color elegido.
     if (celula.colonia !== -1) {//Lo uso para desplegar información acerca de la célula.
@@ -416,4 +348,17 @@ function copiarMatriz(/*arreglo2D*/matrizOriginal, /*arreglo2D*/ matrizCopia) {
             (matrizCopia[cont][cont2]).colonia = (matrizOriginal[cont][cont2]).colonia;
         }
     }
+}
+
+/*
+ Descripción:   Verifica que la cadena tenga al menos dos caracteres.
+ Parámetros:    String cadena: Cadena a verificar
+ Regreso:       String, cadena verificada.
+ */
+function formatearCadena(/*string*/ cadena) {
+    var cadenaFormateada = cadena;
+    if (cadena.length < 2) {
+        cadenaFormateada = "0" + cadena;
+    }
+    return cadenaFormateada;
 }
